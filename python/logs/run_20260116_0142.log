@@ -1,0 +1,10 @@
+2026-01-16 01:42:00 | INFO | === ETL RUN STARTED ===
+2026-01-16 01:42:00 | INFO | Timestamp: 20260116_0142
+2026-01-16 01:42:00 | INFO | Python version: 3.12.3 (main, Aug 14 2025, 17:47:21) [GCC 13.3.0]
+2026-01-16 01:42:00 | INFO | Platform: Linux-5.15.0-1097-aws-aarch64-with-glibc2.39
+2026-01-16 01:42:00 | INFO | Working directory: /Workspace/Repos/win185@ensign.edu/Databricks/python
+2026-01-16 01:42:00 | INFO | Log file: /Workspace/Repos/win185@ensign.edu/Databricks/python/logs/run_20260116_0142.log
+2026-01-16 01:49:36 | INFO | Loaded menu_items.csv with 32 rows
+2026-01-16 01:49:36 | INFO | Loaded order_details.csv with 12234 rows
+2026-01-16 01:49:40 | INFO | Loaded menu_items.csv with 32 rows
+2026-01-16 01:49:40 | INFO | Loaded order_details.csv with 12234 rows

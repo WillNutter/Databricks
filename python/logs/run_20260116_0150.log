@@ -1,0 +1,6 @@
+2026-01-16 01:50:27 | INFO | === ETL RUN STARTED ===
+2026-01-16 01:50:27 | INFO | Timestamp: 20260116_0150
+2026-01-16 01:50:27 | INFO | Python version: 3.12.3 (main, Aug 14 2025, 17:47:21) [GCC 13.3.0]
+2026-01-16 01:50:27 | INFO | Platform: Linux-5.15.0-1097-aws-aarch64-with-glibc2.39
+2026-01-16 01:50:27 | INFO | Working directory: /Workspace/Repos/win185@ensign.edu/Databricks/python
+2026-01-16 01:50:27 | INFO | Log file: /Workspace/Repos/win185@ensign.edu/Databricks/python/logs/run_20260116_0150.log
