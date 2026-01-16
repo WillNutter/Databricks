@@ -1,4 +1,4 @@
-﻿order_details_id,order_id,order_date,order_time,item_id
+order_details_id,order_id,order_date,order_time,item_id
 1,1,1/1/23,11:38:36 AM,109
 2,2,1/1/23,11:57:40 AM,108
 3,2,1/1/23,11:57:40 AM,124
