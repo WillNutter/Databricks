@@ -1,0 +1,14 @@
+project:
+  name: csai382_lab_2_4
+  author: your_name_here
+
+paths:
+  data_dir: data
+  logs_dir: logs
+  output_dir: FileStore/tables/etl_output
+
+files:
+  menu_items: menu_items.csv
+  order_details: order_details.csv
+
+random_seed: 0
