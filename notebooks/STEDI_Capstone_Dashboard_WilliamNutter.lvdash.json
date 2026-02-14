@@ -169,6 +169,13 @@
       "queryLines": [
         "SELECT * FROM workspace.silver.stedi_step_curated"
       ]
+    },
+    {
+      "name": "cf36d0fd",
+      "displayName": "stedi_roc_curve_v1",
+      "queryLines": [
+        "SELECT * FROM workspace.analytics.stedi_roc_curve_v1"
+      ]
     }
   ],
   "pages": [
@@ -198,7 +205,7 @@
               "version": 2,
               "frame": {
                 "showTitle": true,
-                "title": "2.1.a Total Sampeld Records",
+                "title": "2.1.a Total Sampled Records",
                 "showDescription": true,
                 "description": "Shows dataset size."
               },
@@ -484,8 +491,8 @@
             }
           },
           "position": {
-            "x": 6,
-            "y": 12,
+            "x": 0,
+            "y": 18,
             "width": 6,
             "height": 6
           }
@@ -574,7 +581,7 @@
           },
           "position": {
             "x": 0,
-            "y": 18,
+            "y": 24,
             "width": 6,
             "height": 6
           }
@@ -628,7 +635,7 @@
           },
           "position": {
             "x": 0,
-            "y": 24,
+            "y": 30,
             "width": 6,
             "height": 6
           }
@@ -669,7 +676,7 @@
           },
           "position": {
             "x": 0,
-            "y": 30,
+            "y": 36,
             "width": 6,
             "height": 6
           }
@@ -687,7 +694,7 @@
           },
           "position": {
             "x": 6,
-            "y": 18,
+            "y": 24,
             "width": 6,
             "height": 6
           }
@@ -705,7 +712,97 @@
           },
           "position": {
             "x": 6,
-            "y": 24,
+            "y": 30,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "f00f92ad",
+            "multilineTextboxSpec": {
+              "lines": [
+                "2.3 Explanation\n",
+                "\n",
+                "The model achieves high recall, meaning it captures most true step events. However, lower precision indicates frequent false positives. This suggests the model over-predicts steps, which aligns with the confusion matrix findings."
+              ]
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 18,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "af8a5f47",
+            "multilineTextboxSpec": {
+              "lines": [
+                "2.6 Explanation\n",
+                "\n",
+                "This dataset shows class imbalance, with the model predicting step events more frequently than non-step events. As a result, the model demonstrates bias toward the positive class, leading to higher false positives.Because step labels are derived from total\\_steps > 0, subtle or borderline movement may be oversimplified into binary categories. This labeling process may introduce process bias.Additionally, the dataset does not include demographic or contextual variables, limiting our ability to assess fairness across different populations or usage conditions.These limitations should be considered before deploying the model in real-world health or activity tracking applications."
+              ]
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 36,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "roc-curve-which-is-really-a-roc-line",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "cf36d0fd",
+                  "fields": [
+                    {
+                      "name": "false_positive_rate",
+                      "expression": "`false_positive_rate`"
+                    },
+                    {
+                      "name": "true_positive_rate",
+                      "expression": "`true_positive_rate`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": "\"ROC\" Curve --which is really a ROC line",
+                "description": "ROC Representation (Single Threshold)\nBecause your ROC collapsed to: (0,0) → (1,1) The AUC is exactly: 0.5"
+              },
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "false_positive_rate",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "true_positive_rate",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 12,
             "width": 6,
             "height": 6
           }
