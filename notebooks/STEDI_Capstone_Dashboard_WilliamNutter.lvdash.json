@@ -1,0 +1,778 @@
+{
+  "datasets": [
+    {
+      "name": "bf238443",
+      "displayName": "stedi_predictions_capstone",
+      "queryLines": [
+        "----2.1.a Total Records\r\n",
+        "SELECT COUNT(*) AS total_records\r\n",
+        "FROM workspace.silver.labeled_step_test_sampled;"
+      ],
+      "catalog": "workspace",
+      "schema": "analytics"
+    },
+    {
+      "name": "f2e84c6f",
+      "displayName": "labeled_step_test_sampled",
+      "queryLines": [
+        "---2.1b\r\n",
+        "SELECT \r\n",
+        "  CASE \r\n",
+        "    WHEN total_steps > 0 THEN 1 \r\n",
+        "    ELSE 0 \r\n",
+        "  END AS step_label,\r\n",
+        "  COUNT(*) AS count\r\n",
+        "FROM workspace.silver.labeled_step_test_sampled\r\n",
+        "GROUP BY 1\r\n",
+        "ORDER BY 1;"
+      ]
+    },
+    {
+      "name": "39577d46",
+      "displayName": "stedi_predictions_capstone",
+      "queryLines": [
+        "----2.1.c Label Distribution (Derived)\r\n",
+        "SELECT 'Min Distance' AS metric, MIN(distance_cm) AS value\r\n",
+        "FROM workspace.silver.labeled_step_test_sampled\r\n",
+        "\r\n",
+        "UNION ALL\r\n",
+        "\r\n",
+        "SELECT 'Max Distance' AS metric, MAX(distance_cm) AS value\r\n",
+        "FROM workspace.silver.labeled_step_test_sampled\r\n",
+        "\r\n",
+        "UNION ALL\r\n",
+        "\r\n",
+        "SELECT 'Average Distance' AS metric, AVG(distance_cm) AS value\r\n",
+        "FROM workspace.silver.labeled_step_test_sampled\r\n",
+        "\r\n",
+        "UNION ALL\r\n",
+        "\r\n",
+        "SELECT 'Std Dev Distance' AS metric, STDDEV(distance_cm) AS value\r\n",
+        "FROM workspace.silver.labeled_step_test_sampled;"
+      ],
+      "catalog": "workspace",
+      "schema": "analytics"
+    },
+    {
+      "name": "bdd20929",
+      "displayName": "stedi_predictions_capstone",
+      "queryLines": [
+        "---2.2.a Readings Over Time\r\n",
+        "SELECT \r\n",
+        "  device_id,\r\n",
+        "  COUNT(*) AS reading_count\r\n",
+        "FROM workspace.silver.labeled_step_test_sampled\r\n",
+        "GROUP BY device_id\r\n",
+        "ORDER BY reading_count DESC;"
+      ],
+      "catalog": "workspace",
+      "schema": "analytics"
+    },
+    {
+      "name": "55bc6eab",
+      "displayName": "stedi_predictions_capstone",
+      "queryLines": [
+        "---2.2.b Steps Over Time\r\n",
+        "SELECT \r\n",
+        "  timestamp AS date,\r\n",
+        "  COUNT(*) AS reading_count\r\n",
+        "FROM workspace.silver.labeled_step_test_sampled\r\n",
+        "GROUP BY timestamp\r\n",
+        "ORDER BY timestamp;"
+      ],
+      "catalog": "workspace",
+      "schema": "analytics"
+    },
+    {
+      "name": "1dae6e82",
+      "displayName": "stedi_predictions_capstone",
+      "queryLines": [
+        "---2.3 Accuracy\r\n",
+        "WITH base AS (\r\n",
+        "  SELECT\r\n",
+        "    SUM(CASE WHEN actual_label = predicted_label THEN 1 ELSE 0 END) AS correct,\r\n",
+        "    COUNT(*) AS total,\r\n",
+        "    SUM(CASE WHEN actual_label = 1 AND predicted_label = 1 THEN 1 ELSE 0 END) AS tp,\r\n",
+        "    SUM(CASE WHEN predicted_label = 1 THEN 1 ELSE 0 END) AS predicted_positive,\r\n",
+        "    SUM(CASE WHEN actual_label = 1 THEN 1 ELSE 0 END) AS actual_positive\r\n",
+        "  FROM workspace.analytics.stedi_predictions_capstone\r\n",
+        ")\r\n",
+        "\r\n",
+        "SELECT 'Accuracy' AS metric_name, correct / total AS value FROM base\r\n",
+        "UNION ALL\r\n",
+        "SELECT 'Precision', tp / predicted_positive FROM base\r\n",
+        "UNION ALL\r\n",
+        "SELECT 'Recall', tp / actual_positive FROM base\r\n",
+        "UNION ALL\r\n",
+        "SELECT 'F1 Score',\r\n",
+        "  2 * (tp / predicted_positive) * (tp / actual_positive)\r\n",
+        "  /\r\n",
+        "  ((tp / predicted_positive) + (tp / actual_positive))\r\n",
+        "FROM base;"
+      ],
+      "catalog": "workspace",
+      "schema": "analytics"
+    },
+    {
+      "name": "cb1aba64",
+      "displayName": "stedi_predictions_capstone",
+      "queryLines": [
+        "----SECTION 2.4 — Confusion Matrix\r\n",
+        "SELECT \r\n",
+        "  actual_label,\r\n",
+        "  predicted_label,\r\n",
+        "  COUNT(*) AS count\r\n",
+        "FROM workspace.analytics.stedi_predictions_capstone\r\n",
+        "GROUP BY actual_label, predicted_label\r\n",
+        "ORDER BY actual_label, predicted_label;"
+      ],
+      "catalog": "workspace",
+      "schema": "analytics"
+    },
+    {
+      "name": "786719f3",
+      "displayName": "stedi_predictions_capstone",
+      "queryLines": [
+        "---SECTION 2.5 — Feature Importance\r\n",
+        "SELECT\r\n",
+        "  CASE WHEN total_steps > 0 THEN 1 ELSE 0 END AS step_label,\r\n",
+        "  AVG(distance_cm) AS avg_distance,\r\n",
+        "  AVG(test_time) AS avg_test_time,\r\n",
+        "  AVG(total_steps) AS avg_total_steps\r\n",
+        "FROM workspace.silver.labeled_step_test_sampled\r\n",
+        "GROUP BY step_label;"
+      ]
+    },
+    {
+      "name": "f0812008",
+      "displayName": "stedi_feature_importance",
+      "queryLines": [
+        "SELECT * FROM workspace.analytics.stedi_feature_importance"
+      ]
+    },
+    {
+      "name": "a1a578e3",
+      "displayName": "stedi_predictions_capstone",
+      "queryLines": [
+        "---SECTION 2.6 — Bias / Fairness Discussion\r\n",
+        "SELECT\r\n",
+        "  SUM(CASE WHEN actual_label != predicted_label THEN 1 ELSE 0 END) \r\n",
+        "  / COUNT(*) AS error_rate\r\n",
+        "FROM workspace.analytics.stedi_predictions_capstone;"
+      ],
+      "catalog": "workspace",
+      "schema": "analytics"
+    },
+    {
+      "name": "d935fd54",
+      "displayName": "stedi_step_curated",
+      "queryLines": [
+        "SELECT * FROM workspace.silver.stedi_step_curated"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "ff9dd2f8",
+      "displayName": "STEDI_Capstone_Dashboard_WilliamNutter",
+      "layout": [
+        {
+          "widget": {
+            "name": "2-1-a-total-sampled-records",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "bf238443",
+                  "fields": [
+                    {
+                      "name": "sum(total_records)",
+                      "expression": "SUM(`total_records`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "2.1.a Total Sampeld Records",
+                "showDescription": true,
+                "description": "Shows dataset size."
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(total_records)"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "2-1-b-feature-distribution-distance-cm-example",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "f2e84c6f",
+                  "fields": [
+                    {
+                      "name": "step_label",
+                      "expression": "`step_label`"
+                    },
+                    {
+                      "name": "count",
+                      "expression": "`count`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "2.1.b Feature Distribution (distance_cm example)",
+                "showDescription": true,
+                "description": "Shows class balance (data problem showing no step)"
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "step_label",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "count",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 0,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "e769c27f",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "39577d46",
+                  "fields": [
+                    {
+                      "name": "metric",
+                      "expression": "`metric`"
+                    },
+                    {
+                      "name": "sum(value)",
+                      "expression": "SUM(`value`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "title": "2.1.c Label Distribution (Derived)",
+                "showTitle": true,
+                "showDescription": true,
+                "description": "Shows overall spread and variability of sensor distance values."
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "metric",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(value)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 6,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "2-2a",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "bdd20929",
+                  "fields": [
+                    {
+                      "name": "device_id",
+                      "expression": "`device_id`"
+                    },
+                    {
+                      "name": "reading_count",
+                      "expression": "`reading_count`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": "2.2a",
+                "description": "Number of Readings per Device"
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "device_id",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "reading_count",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 6,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "2-2b",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "55bc6eab",
+                  "fields": [
+                    {
+                      "name": "date",
+                      "expression": "`date`"
+                    },
+                    {
+                      "name": "reading_count",
+                      "expression": "`reading_count`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": "2.2b",
+                "description": "Number of Readings Over Time"
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "date",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "reading_count",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 12,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "2-3",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "1dae6e82",
+                  "fields": [
+                    {
+                      "name": "metric_name",
+                      "expression": "`metric_name`"
+                    },
+                    {
+                      "name": "sum(value)",
+                      "expression": "SUM(`value`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": "2.3",
+                "description": "Model Performance Panel"
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "metric_name",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "sum(value)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 12,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "2-4",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "cb1aba64",
+                  "fields": [
+                    {
+                      "name": "actual_label",
+                      "expression": "`actual_label`"
+                    },
+                    {
+                      "name": "predicted_label",
+                      "expression": "`predicted_label`"
+                    },
+                    {
+                      "name": "sum(count)",
+                      "expression": "SUM(`count`)"
+                    }
+                  ],
+                  "cubeGroupingSets": {
+                    "sets": [
+                      {
+                        "fieldNames": [
+                          "actual_label"
+                        ]
+                      },
+                      {
+                        "fieldNames": [
+                          "predicted_label"
+                        ]
+                      }
+                    ]
+                  },
+                  "disaggregated": false,
+                  "orders": [
+                    {
+                      "direction": "ASC",
+                      "expression": "`actual_label`"
+                    },
+                    {
+                      "direction": "ASC",
+                      "expression": "`predicted_label`"
+                    }
+                  ]
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": "2.4",
+                "description": "Confusion Matrix"
+              },
+              "widgetType": "pivot",
+              "encodings": {
+                "rows": [
+                  {
+                    "fieldName": "actual_label"
+                  }
+                ],
+                "columns": [
+                  {
+                    "fieldName": "predicted_label"
+                  }
+                ],
+                "cell": {
+                  "type": "multi-cell",
+                  "fields": [
+                    {
+                      "fieldName": "sum(count)",
+                      "cellType": "text"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 18,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "2-5",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "f0812008",
+                  "fields": [
+                    {
+                      "name": "feature",
+                      "expression": "`feature`"
+                    },
+                    {
+                      "name": "importance",
+                      "expression": "`importance`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": "2.5",
+                "description": "Feature Importance or SHAP Panel"
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "feature",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "importance",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 24,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "2-6-1",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "a1a578e3",
+                  "fields": [
+                    {
+                      "name": "error_rate",
+                      "expression": "`error_rate`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "showDescription": true,
+                "title": "2.6",
+                "description": "Bias and Fairness Panel"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "target": {
+                  "fieldName": "error_rate"
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 30,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "aa812289",
+            "multilineTextboxSpec": {
+              "lines": [
+                "2.4 Explanation\n",
+                "\n",
+                "The confusion matrix shows that the model predicts only the positive class (step = 1). While it correctly identifies many true step events, it incorrectly classifies all non-step events as steps. This indicates strong class bias toward predicting steps and suggests the model lacks the ability to detect negative cases."
+              ]
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 18,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "977fdab1",
+            "multilineTextboxSpec": {
+              "lines": [
+                "2.5 Explanation\n",
+                "\n",
+                "The RandomForest model provides built-in feature importance based on reduction in impurity across decision trees. The results show that Feature 1 contributes slightly more to classification decisions than Feature 0, accounting for approximately 56.8% of total importance compared to 43.2%. This indicates both features influence the prediction, with Feature 1 having stronger predictive power."
+              ]
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 24,
+            "width": 6,
+            "height": 6
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "33d7e9f1",
+      "displayName": "Global Filters",
+      "layout": [
+        {
+          "widget": {
+            "name": "predictions",
+            "queries": [
+              {
+                "name": "dashboards/01f1087ff173192cb2242a368c490661/datasets/01f1088031ac1e1ebbb781b87089164a_step_label",
+                "query": {
+                  "datasetName": "d935fd54",
+                  "fields": [
+                    {
+                      "name": "step_label",
+                      "expression": "`step_label`"
+                    },
+                    {
+                      "name": "step_label_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "title": "Predictions",
+                "showTitle": true
+              },
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "step_label",
+                    "queryName": "dashboards/01f1087ff173192cb2242a368c490661/datasets/01f1088031ac1e1ebbb781b87089164a_step_label"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 1,
+            "height": 2
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_GLOBAL_FILTERS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}
